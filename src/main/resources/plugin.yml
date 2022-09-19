@@ -1,0 +1,10 @@
+name: FWep
+version: '${project.version}'
+main: me.b1n4ry.fwep.Fwep
+api-version: 1.19
+authors: [ b1n4ry ]
+description: cool weapons with abilities
+commands:
+  giveweapon:
+    description: gives weapon
+    usage: /giveweapon <weapon>
