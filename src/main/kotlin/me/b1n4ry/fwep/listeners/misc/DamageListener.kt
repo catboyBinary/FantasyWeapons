@@ -4,6 +4,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.player.PlayerItemHeldEvent
 import kotlin.math.roundToInt
 
 object DamageListener : Listener {

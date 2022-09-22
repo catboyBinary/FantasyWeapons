@@ -11,9 +11,10 @@ import org.bukkit.Bukkit
 import org.bukkit.Sound
 import org.bukkit.event.player.PlayerInteractEvent
 
-object LegitimooseSword {
-    private const val id = "legitimoosesword"
-    private const val cooldown = 1.5
+object ExampleSword {
+    private const val id = "examplesword"
+    private const val cooldown = 1.0
+
     fun rightClickAction(e: PlayerInteractEvent) {
         if(e.player.hasCooldown(id)) { e.player.sendActionBar(Component.text("Cooldown: ${e.player.getCooldown(id)}s"))
             return }
@@ -21,9 +22,8 @@ object LegitimooseSword {
         e.player.swingMainHand()
 
         Bukkit.getScheduler().runTaskLater(instance, Runnable { e.player.playSound(e.player, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f,1f)
-            e.player.sendActionBar(Component.text("Legitimoose Sword is ready!", NamedTextColor.GREEN)) }, (cooldown *20).toLong())
+            e.player.sendActionBar(Component.text("Example Sword is ready!", NamedTextColor.GREEN)) }, (cooldown*20).toLong())
 
-        e.player.world.playSound(e.player.location,Sound.BLOCK_AMETHYST_BLOCK_CHIME,1.0f,1.0f)
-        e.player.velocity = e.player.velocity.multiply(5)
+        // CODE
     }
 }

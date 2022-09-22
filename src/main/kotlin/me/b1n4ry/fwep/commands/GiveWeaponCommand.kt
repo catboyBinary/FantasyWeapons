@@ -10,11 +10,12 @@ import org.bukkit.entity.Player
 object GiveWeaponCommand : CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {
         if(sender is Player) {
-            val p = sender as Player
+            val p = sender
             if(command.name.lowercase() == "giveweapon" && args?.size == 1) {
                 when(args[0]) {
-                    "testWeapon" -> p.inventory.addItem(Items.testWeapon)
-                    "legitimooseSword" -> p.inventory.addItem(Items.legitimooseSword)
+                    "examplesword" -> p.inventory.addItem(Items.exampleSword)
+                    "legitimoosesword" -> p.inventory.addItem(Items.legitimooseSword)
+                    "summitshaper" -> p.inventory.addItem(Items.summitshaper)
                 }
                 return true
             }
@@ -24,7 +25,7 @@ object GiveWeaponCommand : CommandExecutor {
 }
 
 object GiveWeaponTabCompletion : TabCompleter {
-    val list = mutableListOf("testWeapon","legitimooseSword")
+    private val list = mutableListOf("examplesword", "legitimoosesword", "summitshaper")
     override fun onTabComplete(
         sender: CommandSender,
         command: Command,
@@ -34,9 +35,7 @@ object GiveWeaponTabCompletion : TabCompleter {
         if(!sender.hasPermission("admin")) {
             return mutableListOf()
         }
-        if(command.name == "giveweapon") {
-            if(args?.size == 1) return list
-        }
+        if(command.name == "giveweapon") { if(args?.size == 1) return list }
         return null
     }
 }

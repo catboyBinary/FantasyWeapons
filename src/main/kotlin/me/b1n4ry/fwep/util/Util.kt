@@ -1,6 +1,10 @@
 package me.b1n4ry.fwep.util
 
 import me.b1n4ry.fwep.Fwep
+import me.b1n4ry.fwep.instance
+import me.b1n4ry.fwep.util.Util.hasCooldown
+import me.b1n4ry.fwep.util.Util.setCooldown
+import me.b1n4ry.fwep.util.Util.setDef
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
@@ -8,6 +12,7 @@ import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.NamespacedKey
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
+import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
@@ -26,12 +31,12 @@ object Util {
     private val one = listOf('I',' ','[',']', '{', '}')
     private val two = listOf('✦','★')
     private val rarities = listOf<Component>(
-            Component.text(alignString("[✧✧✧✧✧]"), Rarity.none),
-            Component.text(alignString("[✦✧✧✧✧]"), Rarity.common),
-            Component.text(alignString("[✦✦✧✧✧]"), Rarity.uncommon),
-            Component.text(alignString("[✦✦✦✧✧]"), Rarity.rare),
-            Component.text(alignString("[✦✦✦✦✧]"), Rarity.epic),
-            Component.text(alignString("[✦✦✦✦✦]"), Rarity.legendary),
+            Component.text(alignString("[✧✧✧✧✧]"),  Rarity.none),
+            Component.text(alignString("[✦✧✧✧✧]"),  Rarity.common),
+            Component.text(alignString("[✦✦✧✧✧]"),  Rarity.uncommon),
+            Component.text(alignString("[✦✦✦✧✧]"),  Rarity.rare),
+            Component.text(alignString("[✦✦✦✦✧]"),  Rarity.epic),
+            Component.text(alignString("[✦✦✦✦✦]"),  Rarity.legendary),
             Component.text(alignString("{✦✦✦✦✦✦}"), Rarity.admin)
     )
 
@@ -54,20 +59,20 @@ object Util {
         val spaces = "                  ".dropLast((countSpaces(name)/2).roundToInt())
         return spaces+name+spaces
     }
-    private fun setDamage(d: Double, meta: ItemMeta) {
-        meta.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, AttributeModifier(UUID.randomUUID(), "damage", d-1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND))
+    private fun ItemMeta.setDamage(d: Double) {
+        this.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, AttributeModifier(UUID.randomUUID(), "damage", d-1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND))
     }
-    private fun setAtkSpeed(d: Double, meta: ItemMeta) {
-        meta.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, AttributeModifier(UUID.randomUUID(), "attackspeed", d-4, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND))
+    private fun ItemMeta.setAtkSpeed(d: Double) {
+        this.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, AttributeModifier(UUID.randomUUID(), "attackspeed", d-4, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND))
     }
-    private fun setMvSpeed(d: Double, meta: ItemMeta) {
-        meta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, AttributeModifier(UUID.randomUUID(), "movementspeed", d-0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND))
+    private fun ItemMeta.setMvSpeed(d: Double) {
+        this.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, AttributeModifier(UUID.randomUUID(), "movementspeed", d-0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND))
     }
-    private fun setDef(d: Double, meta: ItemMeta) {
-        meta.addAttributeModifier(Attribute.GENERIC_ARMOR, AttributeModifier(UUID.randomUUID(), "defense", d, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND))
-        if(d>0)meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, AttributeModifier(UUID.randomUUID(), "toughness", 2.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND))
+    private fun ItemMeta.setDef(d: Double) {
+        this.addAttributeModifier(Attribute.GENERIC_ARMOR, AttributeModifier(UUID.randomUUID(), "defense", d, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND))
+        if(d>0)this.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, AttributeModifier(UUID.randomUUID(), "toughness", 2.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND))
     }
-    private fun generateLore(rarity: Int, damage: Double, atkspeed: Double, mvspeed: Double, def: Double) : List<Component> {
+    private fun generateLore(rarity: Int, damage: Double, atkspeed: Double, mvspeed: Double, def: Double, cd: Double) : List<Component> {
         return listOf(
                 rarities[rarity],
                 Component.empty(),
@@ -75,20 +80,39 @@ object Util {
                 Component.text(alignString("\uD83D\uDDE1 Base Damage: $damage"), Style.style(TextColor.fromHexString("#08add6"), TextDecoration.ITALIC.withState(false))),
                 Component.text(alignString("☄ Attack Speed: $atkspeed"), Style.style(TextColor.fromHexString("#08add6"), TextDecoration.ITALIC.withState(false))),
                 Component.text(alignString("→ Movement Speed: $mvspeed%"), Style.style(TextColor.fromHexString("#08add6"), TextDecoration.ITALIC.withState(false))),
-                Component.text(alignString("\uD83D\uDEE1 Defense: +$def"), Style.style(TextColor.fromHexString("#08add6"), TextDecoration.ITALIC.withState(false)))
+                Component.text(alignString("\uD83D\uDEE1 Defense: +$def"), Style.style(TextColor.fromHexString("#08add6"), TextDecoration.ITALIC.withState(false))),
+                Component.text(alignString("Ability Cooldown: ${cd}s"), Style.style(TextColor.fromHexString("#08add6"), TextDecoration.ITALIC.withState(false)))
+
         )
     }
-    fun ItemStack.createWeaponSword(name: String, rarity: Int, damage: Double, atkspeed: Double, mvspeed: Double, def: Double) {
+
+    fun String?.toInternal() : String? {
+        return this?.lowercase()?.replace(" ", "")?.replace("`", "")
+    }
+
+    fun Player.setCooldown(id: String, seconds: Double) {
+        val cooldown = (seconds*1000).toLong()
+        instance.cooldownMap[Pair(this.uniqueId,id)] = System.currentTimeMillis()+cooldown
+    }
+    fun Player.hasCooldown(id: String) : Boolean {
+        if(instance.cooldownMap[Pair(this.uniqueId,id)] == null) return false
+        return this.getCooldown(id) > 0
+    }
+    fun Player.getCooldown(id: String) : Double {
+        return (instance.cooldownMap[Pair(this.uniqueId,id)]!! - System.currentTimeMillis()) / 1000.0
+    }
+    fun ItemStack.createWeaponSword(name: String, rarity: Int, damage: Double, atkspeed: Double, mvspeed: Double, def: Double, cmd: Int, cooldown: Double) {
         val weaponMeta = this.itemMeta
         weaponMeta.isUnbreakable = true
         weaponMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE)
         weaponMeta.displayName(Component.text(alignString(name), rarities[rarity].style()))
-        weaponMeta.lore(generateLore(rarity,damage,atkspeed,mvspeed*100, def))
-        weaponMeta.persistentDataContainer.set(key, PersistentDataType.STRING, name.lowercase().replace(" ", "").replace("`", ""))
-        setDamage(damage, weaponMeta)
-        setAtkSpeed(atkspeed, weaponMeta)
-        setMvSpeed(mvspeed/10, weaponMeta)
-        setDef(def, weaponMeta)
+        weaponMeta.lore(generateLore(rarity,damage,atkspeed,mvspeed*100, def, cooldown))
+        weaponMeta.setCustomModelData(cmd)
+        weaponMeta.persistentDataContainer.set(key, PersistentDataType.STRING, name.toInternal().toString())
+        weaponMeta.setDamage(damage)
+        weaponMeta.setAtkSpeed(atkspeed)
+        weaponMeta.setMvSpeed(mvspeed/10)
+        weaponMeta.setDef(def)
         this.itemMeta = weaponMeta
     }
 }
