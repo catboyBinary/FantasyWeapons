@@ -86,6 +86,17 @@ object Util {
         )
     }
 
+    private fun generateBowLore(rarity: Int, mvspeed: Double, def: Double, damage: Double) : List<Component> {
+        return listOf(
+            rarities[rarity],
+            Component.empty(),
+            Component.text(alignString(" Stats"), Style.style(TextColor.fromHexString("#75e3ff"), TextDecoration.ITALIC.withState(false))),
+            Component.text(alignString("\uD83D\uDDE1 Projectile Damage: $damage"), Style.style(TextColor.fromHexString("#08add6"), TextDecoration.ITALIC.withState(false))),
+            Component.text(alignString("→ Movement Speed: $mvspeed%"), Style.style(TextColor.fromHexString("#08add6"), TextDecoration.ITALIC.withState(false))),
+            Component.text(alignString("\uD83D\uDEE1 Defense: +$def"), Style.style(TextColor.fromHexString("#08add6"), TextDecoration.ITALIC.withState(false)))
+        )
+    }
+
     fun String?.toInternal() : String? {
         return this?.lowercase()?.replace(" ", "")?.replace("`", "")
     }
@@ -111,6 +122,19 @@ object Util {
         weaponMeta.persistentDataContainer.set(key, PersistentDataType.STRING, name.toInternal().toString())
         weaponMeta.setDamage(damage)
         weaponMeta.setAtkSpeed(atkspeed)
+        weaponMeta.setMvSpeed(mvspeed/10)
+        weaponMeta.setDef(def)
+        this.itemMeta = weaponMeta
+    }
+
+    fun ItemStack.createWeaponBow(name: String, rarity: Int, damage: Double, mvspeed: Double, def: Double, cmd: Int) {
+        val weaponMeta = this.itemMeta
+        weaponMeta.isUnbreakable = true
+        weaponMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE)
+        weaponMeta.displayName(Component.text(alignString(name), rarities[rarity].style()))
+        weaponMeta.lore(generateBowLore(rarity,mvspeed*100, def, damage))
+        weaponMeta.setCustomModelData(cmd)
+        weaponMeta.persistentDataContainer.set(key, PersistentDataType.STRING, name.toInternal().toString())
         weaponMeta.setMvSpeed(mvspeed/10)
         weaponMeta.setDef(def)
         this.itemMeta = weaponMeta

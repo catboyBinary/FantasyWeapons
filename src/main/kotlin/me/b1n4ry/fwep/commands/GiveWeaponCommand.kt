@@ -16,6 +16,7 @@ object GiveWeaponCommand : CommandExecutor {
                     "examplesword" -> p.inventory.addItem(Items.exampleSword)
                     "legitimoosesword" -> p.inventory.addItem(Items.legitimooseSword)
                     "summitshaper" -> p.inventory.addItem(Items.summitshaper)
+                    "foresthunter" -> p.inventory.addItem(Items.foresthunter)
                 }
                 return true
             }
@@ -25,7 +26,7 @@ object GiveWeaponCommand : CommandExecutor {
 }
 
 object GiveWeaponTabCompletion : TabCompleter {
-    private val list = mutableListOf("examplesword", "legitimoosesword", "summitshaper")
+    private val list = mutableListOf("examplesword", "legitimoosesword", "summitshaper", "foresthunter")
     override fun onTabComplete(
         sender: CommandSender,
         command: Command,

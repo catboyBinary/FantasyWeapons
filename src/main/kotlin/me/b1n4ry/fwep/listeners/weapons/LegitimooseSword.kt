@@ -1,6 +1,7 @@
 package me.b1n4ry.fwep.listeners.weapons
 
 import me.b1n4ry.fwep.instance
+import me.b1n4ry.fwep.util.CustomProjectile
 import me.b1n4ry.fwep.util.Items
 import me.b1n4ry.fwep.util.Util.getCooldown
 import me.b1n4ry.fwep.util.Util.hasCooldown
@@ -8,6 +9,7 @@ import me.b1n4ry.fwep.util.Util.setCooldown
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Bukkit
+import org.bukkit.Color
 import org.bukkit.Sound
 import org.bukkit.event.player.PlayerInteractEvent
 
