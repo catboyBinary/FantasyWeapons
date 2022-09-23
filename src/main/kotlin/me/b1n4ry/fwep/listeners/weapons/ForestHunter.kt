@@ -1,13 +1,11 @@
 package me.b1n4ry.fwep.listeners.weapons
 
 import me.b1n4ry.fwep.instance
-import me.b1n4ry.fwep.util.CustomProjectile
-import me.b1n4ry.fwep.util.RepeatingTask
+import me.b1n4ry.fwep.util.ForestBolt
 import me.b1n4ry.fwep.util.Util.hasCooldown
 import me.b1n4ry.fwep.util.Util.setCooldown
 import org.bukkit.Color
 import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.metadata.FixedMetadataValue
@@ -27,7 +25,7 @@ object ForestHunter {
             if(!shooter.hasCooldown(id)) {
                 shooter.setCooldown(id, 1.0)
                 for (i in 0..3) {
-                    CustomProjectile(ent.location.add(0.0, 3.0, 0.0), Color.LIME, 0.75f, shooter.uniqueId, ent, 80)
+                    ForestBolt(ent.location.add(0.0, 3.0, 0.0), Color.LIME, 0.75f, shooter.uniqueId, ent, 80)
                 }
             }
         }

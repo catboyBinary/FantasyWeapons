@@ -3,12 +3,10 @@ package me.b1n4ry.fwep.util
 import me.b1n4ry.fwep.instance
 import org.bukkit.*
 import org.bukkit.entity.LivingEntity
-import org.bukkit.scheduler.BukkitRunnable
-import org.bukkit.scheduler.BukkitTask
 import org.bukkit.util.Vector
 import java.util.*
 
-data class CustomProjectile(var location: Location, var color: Color, var size: Float, val owner: UUID, val target: LivingEntity?, val destroyAfter: Long) {
+data class ForestBolt(var location: Location, var color: Color, var size: Float, val owner: UUID, val target: LivingEntity?, val destroyAfter: Long) {
     val uuid = UUID.randomUUID()
     val r = Random()
     val x: Double = r.nextDouble()-0.5
@@ -24,17 +22,18 @@ data class CustomProjectile(var location: Location, var color: Color, var size: 
                 //HIT ENTITY
                 if(location.getNearbyLivingEntities(0.25).isNotEmpty()) {
                     val ent = location.getNearbyLivingEntities(0.25).first()
+                    val damager = Bukkit.getServer().getEntity(owner)
                     ent.maximumNoDamageTicks = 0
                     ent.noDamageTicks=0
-                    ent.damage(2.5, Bukkit.getServer().getEntity(owner))
+                    ent.damage(2.5, damager)
                     ent.maximumNoDamageTicks = 20
-                    this@CustomProjectile.remove()
+                    this@ForestBolt.remove()
                     //location.getNearbyLivingEntities(0.25).first().sendMessage("$uuid is dead")
                 }
 
                 // PHYSICS
                 if(target != null){
-                    val projectile = this@CustomProjectile
+                    val projectile = this@ForestBolt
                     if (projectile in instance.projectiles && !target.isDead) {
                         projectile.location.add(
                             target.location.clone().add(0.0, 1.0, 0.0).add(projectile.location.clone().multiply(-1.0))
@@ -48,12 +47,12 @@ data class CustomProjectile(var location: Location, var color: Color, var size: 
                 }
 
                 location.add(velocity)
-                if(!instance.projectiles.contains(this@CustomProjectile)) cancel()
+                if(!instance.projectiles.contains(this@ForestBolt)) cancel()
             }
         }
         //SELFDESTRUCTION
         if(destroyAfter>=0) Bukkit.getScheduler().runTaskLater(instance, Runnable {
-            if(this@CustomProjectile in instance.projectiles) this@CustomProjectile.remove()
+            if(this@ForestBolt in instance.projectiles) this@ForestBolt.remove()
         },80)
     }
 
