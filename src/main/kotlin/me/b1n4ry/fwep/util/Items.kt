@@ -14,6 +14,6 @@ object Items {
         exampleSword.createWeaponSword("Example Sword", 5, 8.35, 1.3, 0.85, 5.0, 1, 1.0)
         legitimooseSword.createWeaponSword("Legitimoose Sword", 6, 6.9, 1.75, 1.0, 0.0, 1, 1.5)
         summitshaper.createWeaponSword("Summit Shaper", 5, 8.0, 1.8, 1.0, 4.0, 1, 15.0)
-        foresthunter.createWeaponBow("Forest Hunter", 5, 2.5, 1.1, 0.0, 1)
+        foresthunter.createWeaponBow("Forest Hunter", 5, 2.5, 1.15, 0.0, 1)
     }
 }

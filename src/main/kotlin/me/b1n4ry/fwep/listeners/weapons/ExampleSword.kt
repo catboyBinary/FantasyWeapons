@@ -12,11 +12,13 @@ import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Bukkit
 import org.bukkit.Color
 import org.bukkit.Sound
+import org.bukkit.entity.LivingEntity
 import org.bukkit.event.player.PlayerInteractEvent
+import java.util.*
 
 object ExampleSword {
     private const val id = "examplesword"
-    private const val cooldown = 1.0
+    private const val cooldown = 0.05
 
     fun rightClickAction(e: PlayerInteractEvent) {
         if(e.player.hasCooldown(id)) { e.player.sendActionBar(Component.text("Cooldown: ${e.player.getCooldown(id)}s"))

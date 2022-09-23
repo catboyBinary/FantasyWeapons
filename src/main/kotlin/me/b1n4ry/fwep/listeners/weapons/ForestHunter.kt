@@ -3,8 +3,11 @@ package me.b1n4ry.fwep.listeners.weapons
 import me.b1n4ry.fwep.instance
 import me.b1n4ry.fwep.util.CustomProjectile
 import me.b1n4ry.fwep.util.RepeatingTask
+import me.b1n4ry.fwep.util.Util.hasCooldown
+import me.b1n4ry.fwep.util.Util.setCooldown
 import org.bukkit.Color
 import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.metadata.FixedMetadataValue
@@ -21,22 +24,11 @@ object ForestHunter {
         if(e.hitEntity != null && e.hitEntity is LivingEntity) {
             val ent = e.hitEntity as LivingEntity
             val shooter = e.entity.shooter as LivingEntity
-            for(i in 0..3){
-                val new = CustomProjectile(ent.location.add(0.0, 3.0, 0.0), Color.LIME, 0.75f, shooter.uniqueId)
-                object : RepeatingTask(instance, 0, 0) {
-                    override fun run() {
-                        if (new in instance.projectiles && !ent.isDead) {
-                            new.location.add(ent.location.clone().add(0.0, 1.0, 0.0).add(new.location.clone().multiply(-1.0))
-                                .multiply(0.05))
-                            new.velocity.add(
-                                (ent.location.clone().add(0.0, 1.0, 0.0).add(new.location.clone().multiply(-1.0))
-                                    .multiply(0.025)).toVector()
-                            )
-                        } else { new.remove()
-                        cancel()}
-                    }
+            if(!shooter.hasCooldown(id)) {
+                shooter.setCooldown(id, 1.0)
+                for (i in 0..3) {
+                    CustomProjectile(ent.location.add(0.0, 3.0, 0.0), Color.LIME, 0.75f, shooter.uniqueId, ent, 80)
                 }
-                //e.player.sendMessage(new.uuid.toString())
             }
         }
     }
