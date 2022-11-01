@@ -6,28 +6,29 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.util.Vector
 import java.util.*
 
-data class ForestBolt(var location: Location, var color: Color, var size: Float, val owner: UUID, val target: LivingEntity?, val destroyAfter: Long) {
+data class ForestBolt(var location: Location, var color: Color, var size: Float, val owner: UUID, val target: LivingEntity?, val destroyAfter: Long, var velocity: Vector, val damage: Double) {
     val uuid = UUID.randomUUID()
-    val r = Random()
-    val x: Double = r.nextDouble()-0.5
-    val z: Double = r.nextDouble()-0.5
-    val y: Double = r.nextDouble()*0.25+0.25
-    var velocity = Vector(x,y,z)
     init {
         instance.projectiles.add(this)
         object : RepeatingTask(instance, 0, 0) {
             override fun run() {
                 location.world.spawnParticle(Particle.REDSTONE,location,1,Particle.DustOptions(color,size))
+                location.world.spawnParticle(Particle.REDSTONE,location.clone().add(velocity.clone().multiply(-0.5)),1,Particle.DustOptions(color,size))
+                location.world.spawnParticle(Particle.REDSTONE,location.clone().add(velocity.clone().multiply(-0.75)),1,Particle.DustOptions(color,size))
+                location.world.spawnParticle(Particle.REDSTONE,location.clone().add(velocity.clone().multiply(-1)),1,Particle.DustOptions(color,size))
+                location.world.spawnParticle(Particle.REDSTONE,location.clone().add(velocity.clone().multiply(-0.25)),1,Particle.DustOptions(color,size))
 
                 //HIT ENTITY
                 if(location.getNearbyLivingEntities(0.25).isNotEmpty()) {
                     val ent = location.getNearbyLivingEntities(0.25).first()
                     val damager = Bukkit.getServer().getEntity(owner)
-                    ent.maximumNoDamageTicks = 0
-                    ent.noDamageTicks=0
-                    ent.damage(2.5, damager)
-                    ent.maximumNoDamageTicks = 20
-                    this@ForestBolt.remove()
+                    if(ent != damager){
+                        ent.maximumNoDamageTicks = 0
+                        ent.noDamageTicks = 0
+                        ent.damage(damage, damager)
+                        ent.maximumNoDamageTicks = 20
+                        this@ForestBolt.remove()
+                    }
                     //location.getNearbyLivingEntities(0.25).first().sendMessage("$uuid is dead")
                 }
 
@@ -41,7 +42,7 @@ data class ForestBolt(var location: Location, var color: Color, var size: Float,
                         )
                         projectile.velocity.add(
                             (target.location.clone().add(0.0, 1.0, 0.0).add(projectile.location.clone().multiply(-1.0))
-                                .multiply(0.025)).toVector()
+                                .multiply(0.05)).toVector()
                         )
                     } else projectile.remove()
                 }
@@ -53,7 +54,7 @@ data class ForestBolt(var location: Location, var color: Color, var size: Float,
         //SELFDESTRUCTION
         if(destroyAfter>=0) Bukkit.getScheduler().runTaskLater(instance, Runnable {
             if(this@ForestBolt in instance.projectiles) this@ForestBolt.remove()
-        },80)
+        },destroyAfter)
     }
 
     fun remove() {

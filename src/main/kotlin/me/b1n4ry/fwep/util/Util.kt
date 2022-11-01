@@ -2,29 +2,32 @@ package me.b1n4ry.fwep.util
 
 import me.b1n4ry.fwep.Fwep
 import me.b1n4ry.fwep.instance
-import me.b1n4ry.fwep.util.Util.hasCooldown
-import me.b1n4ry.fwep.util.Util.setCooldown
-import me.b1n4ry.fwep.util.Util.setDef
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
+import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.EquipmentSlot
+import org.bukkit.inventory.Inventory
+import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.persistence.PersistentDataType
 import java.util.*
-
+import javax.naming.Name
 import kotlin.math.roundToInt
 
 object Util {
     var key = NamespacedKey("fwep","weapontype")
+    var key2 = NamespacedKey("fwep","uuid")
     private val threehalves = listOf('%','a','b','c','d','e','g','h','j','m','n','o','p','q','r','s','t','u','v','w','x','y','z','F','K','L','T','A','B','C','D','E','G','H','J','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','0','1','2','3','4','5','6','7','8','9')
     private val fivequarters = listOf('f','k')
     private val threequarters = listOf('l')
@@ -40,6 +43,7 @@ object Util {
             Component.text(("[✦✦✦✦✦]"),  Rarity.legendary),
             Component.text(("{✦✦✦✦✦✦}"), Rarity.admin)
     )
+    private val defaultStyle = Style.style(NamedTextColor.DARK_GRAY, TextDecoration.ITALIC.withState(false))
 
     private fun countSpaces(s: String): Double {
         var spaces = 0.0
@@ -73,17 +77,16 @@ object Util {
         this.addAttributeModifier(Attribute.GENERIC_ARMOR, AttributeModifier(UUID.randomUUID(), "defense", d, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND))
         if(d>0)this.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, AttributeModifier(UUID.randomUUID(), "toughness", 2.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND))
     }
-    private fun generateLore(rarity: Int, damage: Double, atkspeed: Double, mvspeed: Double, def: Double, cd: Double) : List<Component> {
-        return listOf(
-                rarities[rarity],
-                Component.empty(),
-                Component.text(("   Stats"), Style.style(TextColor.fromHexString("#75e3ff"), TextDecoration.ITALIC.withState(false))),
-                Component.text(("\uD83D\uDDE1 Base Damage: $damage"), Style.style(TextColor.fromHexString("#08add6"), TextDecoration.ITALIC.withState(false))),
-                Component.text(("☄ Attack Speed: $atkspeed"), Style.style(TextColor.fromHexString("#08add6"), TextDecoration.ITALIC.withState(false))),
-                Component.text(("→ Movement Speed: ${mvspeed.roundToInt()}%"), Style.style(TextColor.fromHexString("#08add6"), TextDecoration.ITALIC.withState(false))),
-                Component.text(("\uD83D\uDEE1 Defense: +$def"), Style.style(TextColor.fromHexString("#08add6"), TextDecoration.ITALIC.withState(false))),
-                Component.text(("⌛ Ability Cooldown: ${cd}s"), Style.style(TextColor.fromHexString("#08add6"), TextDecoration.ITALIC.withState(false)))
-
+    private fun generateLore(rarity: Int, damage: Double, atkspeed: Double, mvspeed: Double, def: Double, cd: Double) : MutableList<Component> {
+        return mutableListOf(
+            rarities[rarity],
+            Component.empty(),
+            Component.text(("   Stats"), Style.style(TextColor.fromHexString("#75e3ff"), TextDecoration.ITALIC.withState(false))),
+            Component.text(("\uD83D\uDDE1 Base Damage: $damage"), Style.style(TextColor.fromHexString("#08add6"), TextDecoration.ITALIC.withState(false))),
+            Component.text(("☄ Attack Speed: $atkspeed"), Style.style(TextColor.fromHexString("#08add6"), TextDecoration.ITALIC.withState(false))),
+            Component.text(("→ Movement Speed: ${mvspeed.roundToInt()}%"), Style.style(TextColor.fromHexString("#08add6"), TextDecoration.ITALIC.withState(false))),
+            Component.text(("\uD83D\uDEE1 Defense: +$def"), Style.style(TextColor.fromHexString("#08add6"), TextDecoration.ITALIC.withState(false))),
+            Component.text(("⌛ Ability Cooldown: ${cd}s"), Style.style(TextColor.fromHexString("#08add6"), TextDecoration.ITALIC.withState(false)))
         )
     }
 
@@ -113,7 +116,7 @@ object Util {
     fun LivingEntity.getCooldown(id: String) : Double {
         return (instance.cooldownMap[Pair(this.uniqueId,id)]!! - System.currentTimeMillis()) / 1000.0
     }
-    fun ItemStack.createWeaponSword(name: String, rarity: Int, damage: Double, atkspeed: Double, mvspeed: Double, def: Double, cmd: Int, cooldown: Double) {
+    fun ItemStack.createWeaponSword(name: String, rarity: Int, damage: Double, combo: List<Float>, atkspeed: Double, mvspeed: Double, def: Double, cmd: Int, cooldown: Double) {
         val weaponMeta = this.itemMeta
         weaponMeta.isUnbreakable = true
         weaponMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE)
@@ -125,8 +128,21 @@ object Util {
         weaponMeta.setAtkSpeed(atkspeed)
         weaponMeta.setMvSpeed(mvspeed/10)
         weaponMeta.setDef(def)
+        //Combo
+        if(true) {
+            val lore = weaponMeta.lore()
+            for(modifier in combo) {
+                println("debug")
+                lore?.add(4+combo.indexOf(modifier),Component.text(
+                        " - ${combo.indexOf(modifier)+1}-Hit Damage: ${modifier*100}%",
+                        Style.style(TextColor.fromHexString("#08add6"), TextDecoration.ITALIC.withState(false))))
+            }
+            weaponMeta.lore(lore)
+        }
+
         this.itemMeta = weaponMeta
     }
+
 
     fun ItemStack.createWeaponBow(name: String, rarity: Int, damage: Double, mvspeed: Double, def: Double, cmd: Int) {
         val weaponMeta = this.itemMeta
@@ -139,5 +155,29 @@ object Util {
         weaponMeta.setMvSpeed(mvspeed/10)
         weaponMeta.setDef(def)
         this.itemMeta = weaponMeta
+    }
+
+    fun ItemMeta.getUUID() : UUID? {
+        if(this.persistentDataContainer.has(key2)) return UUID.fromString(this.persistentDataContainer.get(key2, PersistentDataType.STRING))
+        else return null
+    }
+    fun ItemStack.generateUUID() {
+        val meta = this.itemMeta
+        meta.persistentDataContainer.set(key2, PersistentDataType.STRING, UUID.randomUUID().toString())
+        this.itemMeta = meta
+    }
+
+    fun Player.openWeapon() {
+        val meta = this.inventory.itemInMainHand.itemMeta
+        if(meta.getUUID() != null){
+            val inv: Inventory
+            if (instance.inventoryMap.contains(meta.getUUID())) inv =
+                instance.inventoryMap.get(meta.getUUID())!!
+            else {
+                inv = Bukkit.createInventory(this, InventoryType.DROPPER, meta.displayName()?.style(defaultStyle)!!)
+                instance.inventoryMap.set(meta.getUUID()!!, inv)
+            }
+            this.openInventory(inv)
+        }
     }
 }

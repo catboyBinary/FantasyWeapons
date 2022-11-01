@@ -4,6 +4,7 @@ import me.b1n4ry.fwep.util.Commands
 import me.b1n4ry.fwep.util.ForestBolt
 import me.b1n4ry.fwep.util.Items
 import me.b1n4ry.fwep.util.Listeners
+import org.bukkit.inventory.Inventory
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
 import kotlin.collections.HashMap
@@ -14,6 +15,7 @@ class Fwep : JavaPlugin() {
     val projectiles = mutableListOf<ForestBolt>()
     val cooldownMap = HashMap<Pair<UUID, String>, Long>()
     val comboMap = HashMap<Pair<UUID, String>, Int>()
+    val inventoryMap = HashMap<UUID, Inventory>()
     override fun onEnable() {
         instance = this
         Items.init()

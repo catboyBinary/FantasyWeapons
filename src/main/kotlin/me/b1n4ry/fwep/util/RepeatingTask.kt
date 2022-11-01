@@ -4,11 +4,11 @@ import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 
 
-abstract class RepeatingTask(plugin: JavaPlugin?, arg1: Int, arg2: Int) : Runnable {
+abstract class RepeatingTask(plugin: JavaPlugin?, delay: Int, period: Int) : Runnable {
     private val taskId: Int
 
     init {
-        taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin!!, this, arg1.toLong(), arg2.toLong())
+        taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin!!, this, delay.toLong(), period.toLong())
     }
 
     fun cancel() {

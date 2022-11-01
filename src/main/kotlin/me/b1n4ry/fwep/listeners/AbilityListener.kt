@@ -1,6 +1,5 @@
 package me.b1n4ry.fwep.listeners
 
-import me.b1n4ry.fwep.instance
 import me.b1n4ry.fwep.listeners.weapons.ExampleSword
 import me.b1n4ry.fwep.listeners.weapons.ForestHunter
 import me.b1n4ry.fwep.listeners.weapons.LegitimooseSword
@@ -13,7 +12,6 @@ import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
-import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.persistence.PersistentDataType
 
 object AbilityListener : Listener {
@@ -24,6 +22,7 @@ object AbilityListener : Listener {
                 "examplesword" -> ExampleSword.rightClickAction(e)
                 "legitimoosesword" -> LegitimooseSword.rightClickAction(e)
                 "summitshaper" -> SummitShaper.rightClickAction(e)
+                "foresthunter" -> ForestHunter.rightClickAction(e)
             }
         }
     }
