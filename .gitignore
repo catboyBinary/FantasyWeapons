@@ -2,7 +2,6 @@
 .idea/
 .paper-nms/
 
-*.iml
 *.ipr
 *.iws
 
